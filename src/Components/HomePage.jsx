@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "../Styles/homepage.css";
+import { signOut } from "firebase/auth";
+import { auth } from '../firebase.js';
+import { useNavigate } from "react-router";
 
 export default function HomePage() {
   let [min, setMin] = useState(25);
@@ -9,6 +12,8 @@ export default function HomePage() {
 
   let [breakMin, setBreakMin] = useState(5);
   let [breakSec, setBreakSec] = useState(0);
+
+  let navigate = useNavigate();
 
   useEffect(() => {
     let intervalId;
@@ -56,6 +61,16 @@ export default function HomePage() {
     }
   }, [min, sec, timerRunning, timerStatus, breakMin, breakSec]);
 
+  let handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Signout error:", error);
+      alert("Could not Logout");
+    }
+  }
+
   let handleStart = () => {
     setTimerRunning(true);
   };
@@ -80,12 +95,12 @@ export default function HomePage() {
   return (
     <div className="flex justify-center items-center h-screen bg-gray-500">
       {timerStatus ? <div className="main-timer-container flex flex-col items-center border border-solid border-gray-300 bg-gray-600 shadow-lg rounded-lg p-4 w-11/12 sm:w-3/4 md:w-2/4 lg:w-1/3 xl:w-1/4">
-        <span className="text-4xl sm:text-5xl font-semibold mb-2 text-slate-300">Stopwatch Timer</span>
-        <span className="text-5xl sm:text-6xl mb-4 text-white">{(min < 10) ? "0" + min : min}:{(sec < 10) ? "0" + sec : sec}</span>
+        <span className="text-4xl font-semibold mb-2 text-slate-300">Stopwatch Timer</span>
+        <span className="text-4xl mb-4 text-white">{(min < 10) ? "0" + min : min}:{(sec < 10) ? "0" + sec : sec}</span>
         <div className="main-timer-buttons space-y-2">
-          <button className="bg-red-500 text-white text-xl sm:text-2xl mx-5 px-4 py-2 rounded hover:bg-red-600" onClick={handleReset}>RESET</button>
-          <button className="bg-blue-500 text-white text-xl sm:text-2xl mx-5 px-4 py-2 rounded hover:bg-blue-600" onClick={handlePause}>PAUSE</button>
-          <button className="bg-green-500 text-white text-xl sm:text-2xl mx-5 px-4 py-2 rounded hover:bg-green-600" onClick={handleStart}>START</button>
+            <button className="bg-red-500 text-white text-xl ml-2 sm:text-xl px-4 py-2 rounded hover:bg-red-600" onClick={handleReset}>RESET</button>
+            <button className="bg-blue-500 text-white text-xl ml-2 sm:text-xl px-4 py-2 rounded hover:bg-blue-600" onClick={handlePause}>PAUSE</button>
+            <button className="bg-green-500 text-white text-xl ml-2 sm:text-xl px-4 py-2 rounded hover:bg-green-600" onClick={handleStart}>START</button>
         </div>
       </div> :
       <div className="break-timer-container flex flex-col items-center border border-solid border-gray-300 bg-gray-600 shadow-lg rounded-lg p-4 w-11/12 sm:w-3/4 md:w-2/4 lg:w-1/3 xl:w-1/4">
@@ -95,6 +110,15 @@ export default function HomePage() {
           <button className="bg-red-500 text-white text-xl sm:text-2xl mx-5 px-4 py-2 rounded hover:bg-red-600" onClick={handleFinalReset}>RESET</button>
         </div>
       </div>}
+      <div className="text-center mt-72">
+          <button
+            className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="button"
+            onClick={handleSignOut}
+          >
+            Logout
+          </button>
+        </div>
     </div>
   );
 }
